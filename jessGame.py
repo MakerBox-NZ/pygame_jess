@@ -9,7 +9,13 @@ import os
 '''OBJECTS'''
 #put classes & functions here
 
-
+class Player(pygame.sprite.Sprite):
+    #spawn a player
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(os.path.join('images', 'hero.png')).convert()
+        self.rect = self.image.get_rect()
+                
 
 '''SETUP'''
 #code runs once
@@ -28,6 +34,11 @@ screen = pygame.display.set_mode([screenX, screenY])
 backdrop = pygame.image.load(os.path.join('images','stage.png')).convert()
 backdropRect = screen.get_rect()
 
+player = Player() #spawn player
+player.rect.x = 0
+player.rect.y = 0
+movingsprites = pygame.sprite.Group()
+movingsprites.add(player)
 
 
 
