@@ -81,7 +81,7 @@ while main == True:
                 print('down')
 
     screen.blit(backdrop, backdropRect) #if you have backdrop
-    #screen.fill(black) #if you don't have backdrop
+    #screen.fill((0, 0, 255)) #if you don't have backdrop
 
     movingsprites.draw(screen) #draw player
     
