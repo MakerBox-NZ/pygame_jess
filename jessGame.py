@@ -13,12 +13,32 @@ class Player(pygame.sprite.Sprite):
     #spawn a player
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
+
+        self.momentumX = 0 #move along X
+        self.momentumY = 0 #move along Y
         
         self.image = pygame.image.load(os.path.join('images', 'hero.png')).convert()
         self.rect = self.image.get_rect()
         
         self.image.convert_alpha() #opimise for alpha
         self.image.set_colorkey(alpha) #set alpha
+
+
+    def control(self, x, y):
+        #control player movement
+        self.momentumX += x
+        self.momentumY += y
+
+    def update(self):
+        #update sprite position
+        currentX = self.rect.x
+        nextX = currentX+self.momentumX
+        self.rect.x = nextX
+
+        currentY = self.rect.y
+        nextY = currentY+self.momentumY
+        self.rect.y = nextY
+
 
 
 '''SETUP'''
@@ -47,6 +67,7 @@ player.rect.x = 0
 player.rect.y = 0
 movingsprites = pygame.sprite.Group()
 movingsprites.add(player)
+movesteps = 10 #how fast to move
 
 
 
@@ -63,26 +84,28 @@ while main == True:
                 
             if event.key == pygame.K_LEFT:
                 print('left stop')
+                player.control(movesteps, 0)
             if event.key == pygame.K_RIGHT:
                 print('right stop')
+                player.control(-movesteps, 0)
             if event.key == pygame.K_UP:
-                print('up stop')
-            if event.key == pygame.K_DOWN:
-                print('down stop')
+                print('jump stop')
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 print('left')
+                player.control(-movesteps, 0)
             if event.key == pygame.K_RIGHT:
                 print('right')
+                player.control(movesteps, 0)
             if event.key == pygame.K_UP:
-                print('up')
-            if event.key == pygame.K_DOWN:
-                print('down')
+                print('jump')
+
 
     screen.blit(backdrop, backdropRect) #if you have backdrop
     #screen.fill((0, 0, 255)) #if you don't have backdrop
 
+    player.update() #update player position
     movingsprites.draw(screen) #draw player
     
     pygame.display.flip()
