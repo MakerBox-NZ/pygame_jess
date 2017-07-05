@@ -16,6 +16,8 @@ class Player(pygame.sprite.Sprite):
 
         self.momentumX = 0 #move along X
         self.momentumY = 0 #move along Y
+
+        self.score = 0 #set score
         
         self.image = pygame.image.load(os.path.join('images', 'hero.png')).convert()
         self.rect = self.image.get_rect()
@@ -29,7 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.momentumX += x
         self.momentumY += y
 
-    def update(self):
+    def update(self, enemy_list):
         #update sprite position
         currentX = self.rect.x
         nextX = currentX+self.momentumX
@@ -38,6 +40,14 @@ class Player(pygame.sprite.Sprite):
         currentY = self.rect.y
         nextY = currentY+self.momentumY
         self.rect.y = nextY
+
+        #collisions
+        enemy_hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
+        for enemy in enemy_hit_list:
+            self.score -= 1
+            print(self.score)
+
+    
 
 
 class Enemy (pygame.sprite.Sprite):
@@ -64,6 +74,8 @@ class Enemy (pygame.sprite.Sprite):
 
         self.counter += 1
 
+ 
+        
 
 
 
@@ -136,7 +148,7 @@ while main == True:
     screen.blit(backdrop, backdropRect) #if you have backdrop
     #screen.fill((0, 0, 255)) #if you don't have backdrop
 
-    player.update() #update player position
+    player.update(enemy_list) #update player position
     movingsprites.draw(screen) #draw player
 
     enemy_list.draw(screen) #refresh enemies
