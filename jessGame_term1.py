@@ -9,40 +9,6 @@ import os
 '''OBJECTS'''
 #put classes & functions here
 
-
-class Platform(pygame.sprite.Sprite):
-    #x location, y location, img width, img height, img file)
-    def __init__(self,xloc,yloc,imgw, imgh, img):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface([imgw, imgh])
-        self.image.convert_alpha()
-        self.image.set_colorkey(alpha)
-        self.blockpic = pygame.image.load(img).convert()
-        self.rect = self.image.get_rect()
-        self.rect.y = yloc
-        self.rect.x = xloc
-
-        #paint image into blocks
-        self.image.blit(self.blockpic,(0,0),(0,0,imgw,imgh))
-        
-
-    def level1():
-        #create level 1
-        platform_list = pygame.sprite.Group()
-        block = Platform(0, 591, 500, 77,os.path.join('images','block0.png'))  #(x,y,img w, img h, img file)
-        platform_list.add(block) #after each block
-
-        return platform_list #at end of function level1
-
-
-
-                    
- 
-
-
-
-
-
 class Player(pygame.sprite.Sprite):
     #spawn a player
     def __init__(self):
@@ -117,8 +83,8 @@ class Enemy (pygame.sprite.Sprite):
 '''SETUP'''
 #code runs once
 
-screenX = 1000 #width 1920
-screenY = 800 #height 1080
+screenX = 960 #width
+screenY = 720 #height
 
 alpha = (0, 0, 0)
 black = (1, 1, 1)
@@ -135,17 +101,15 @@ screen = pygame.display.set_mode([screenX, screenY])
 backdrop = pygame.image.load(os.path.join('images','stage.png')).convert()
 backdropRect = screen.get_rect()
 
-platform_list = Platform.level1() #set stage to Level 1
-
 player = Player() #spawn player
-player.rect.x = 20
-player.rect.y = 565
+player.rect.x = 0
+player.rect.y = 0
 movingsprites = pygame.sprite.Group()
 movingsprites.add(player)
 movesteps = 10 #how fast to move
 
 #enemy code
-enemy = Enemy(300,550, 'enemy.png') #spawn enemy
+enemy = Enemy(100,50, 'enemy.png') #spawn enemy
 enemy_list = pygame.sprite.Group() #create enemy group
 enemy_list.add(enemy) #add enemy to group
 
@@ -184,7 +148,6 @@ while main == True:
     screen.blit(backdrop, backdropRect) #if you have backdrop
     #screen.fill((0, 0, 255)) #if you don't have backdrop
 
-    platform_list.draw(screen) #draw platforms on screen
     player.update(enemy_list) #update player position
     movingsprites.draw(screen) #draw player
 
