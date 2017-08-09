@@ -9,7 +9,6 @@ import os
 '''OBJECTS'''
 #put classes & functions here
 
-
 class Platform(pygame.sprite.Sprite):
     #x location, y location, img width, img height, img file)
     def __init__(self,xloc,yloc,imgw, imgh, img):
@@ -18,7 +17,9 @@ class Platform(pygame.sprite.Sprite):
         self.image.convert_alpha()
         self.image.set_colorkey(alpha)
         self.blockpic = pygame.image.load(img).convert()
-        self.rect = self.image.get_rect()
+
+        self.rect = self.image.get_rect() 
+
         self.rect.y = yloc
         self.rect.x = xloc
 
@@ -29,17 +30,12 @@ class Platform(pygame.sprite.Sprite):
     def level1():
         #create level 1
         platform_list = pygame.sprite.Group()
+        #               x    y    w   h
         block = Platform(0, 591, 500, 77,os.path.join('images','block0.png'))  #(x,y,img w, img h, img file)
         platform_list.add(block) #after each block
+   
 
         return platform_list #at end of function level1
-
-
-
-                    
- 
-
-
 
 
 
@@ -59,13 +55,12 @@ class Player(pygame.sprite.Sprite):
         self.image.convert_alpha() #opimise for alpha
         self.image.set_colorkey(alpha) #set alpha
 
-
     def control(self, x, y):
         #control player movement
         self.momentumX += x
         self.momentumY += y
 
-    def update(self, enemy_list):
+    def update(self, enemy_list, platform_list):
         #update sprite position
         currentX = self.rect.x
         nextX = currentX+self.momentumX
@@ -81,8 +76,26 @@ class Player(pygame.sprite.Sprite):
             self.score -= 1
             print(self.score)
 
-    
+        block_hit_list = pygame.sprite.spritecollide(self, platform_list, False)
+        if self.momentumX > 0:
+            for block in block_hit_list:
+                self.rect.y = currentY
+                self.rect.x = currentX+9
+                self.momentumY = 0
 
+        if self.momentumY > 0:
+            for block in block_hit_list:
+                self.rect.y = currentY
+                self.momentumY = 0
+
+    def gravity(self):
+        self.momentumY += 3.2  #how fast player falls
+
+        if self.rect.y > 960 and self.momentumY >= 0:
+            self.momentumY = 0
+            #self.rect.y = screenY-20
+            self.rect.x = 10
+            self.rect.y = 20
 
 class Enemy (pygame.sprite.Sprite):
     #spawn an enemy
@@ -148,6 +161,10 @@ movesteps = 10 #how fast to move
 enemy = Enemy(300,550, 'enemy.png') #spawn enemy
 enemy_list = pygame.sprite.Group() #create enemy group
 enemy_list.add(enemy) #add enemy to group
+ 
+        
+
+
 
 
 '''MAIN LOOP'''
@@ -185,7 +202,8 @@ while main == True:
     #screen.fill((0, 0, 255)) #if you don't have backdrop
 
     platform_list.draw(screen) #draw platforms on screen
-    player.update(enemy_list) #update player position
+    player.gravity() #check gravity
+    player.update(enemy_list, platform_list) #update player position
     movingsprites.draw(screen) #draw player
 
     enemy_list.draw(screen) #refresh enemies
