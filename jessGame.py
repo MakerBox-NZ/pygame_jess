@@ -30,10 +30,12 @@ class Platform(pygame.sprite.Sprite):
     def level1():
         #create level 1
         platform_list = pygame.sprite.Group()
-        #               x    y    w   h
+        
         block = Platform(0, 591, 500, 77,os.path.join('images','block0.png'))  #(x,y,img w, img h, img file)
         platform_list.add(block) #after each block
-   
+
+        block = Platform(640, 591, 500, 77,os.path.join('images','block0.png'))  #(x,y,img w, img h, img file)
+        platform_list.add(block) #after each block
 
         return platform_list #at end of function level1
 
@@ -47,6 +49,10 @@ class Player(pygame.sprite.Sprite):
         self.momentumX = 0 #move along X
         self.momentumY = 0 #move along Y
 
+        #gravity variables
+        self.collide_delta = 0
+        self.jump_delta = 6
+
         self.score = 0 #set score
         
         self.image = pygame.image.load(os.path.join('images', 'hero.png')).convert()
@@ -54,6 +60,7 @@ class Player(pygame.sprite.Sprite):
         # alternate way of scaling # self.image = pygame.transform.scale(self.image, (int(100), int(100)))
         self.image.convert_alpha() #opimise for alpha
         self.image.set_colorkey(alpha) #set alpha
+
 
     def control(self, x, y):
         #control player movement
@@ -70,6 +77,14 @@ class Player(pygame.sprite.Sprite):
         nextY = currentY+self.momentumY
         self.rect.y = nextY
 
+        #gravity
+        if self.collide_delta < 6 and self.jump_delta < 6:
+            self.jump_delta = 6*2
+            self.momentumY -=33 #how high to jump
+
+            self.collide_delta +=6
+            self.jump_delta  += 6      
+
         #collisions
         enemy_hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
         for enemy in enemy_hit_list:
@@ -80,13 +95,20 @@ class Player(pygame.sprite.Sprite):
         if self.momentumX > 0:
             for block in block_hit_list:
                 self.rect.y = currentY
-                self.rect.x = currentX+9
+                self.rect.x = currentX+9 
                 self.momentumY = 0
+                self.collide_delta = 0 #stop jumping
 
         if self.momentumY > 0:
             for block in block_hit_list:
                 self.rect.y = currentY
                 self.momentumY = 0
+                self.collide_delta = 0 #stop jumping
+
+            
+    def jump (self, platform_list):
+        self.jump_delta = 0 
+            
 
     def gravity(self):
         self.momentumY += 3.2  #how fast player falls
@@ -96,6 +118,9 @@ class Player(pygame.sprite.Sprite):
             #self.rect.y = screenY-20
             self.rect.x = 10
             self.rect.y = 20
+            
+
+
 
 class Enemy (pygame.sprite.Sprite):
     #spawn an enemy
@@ -123,7 +148,6 @@ class Enemy (pygame.sprite.Sprite):
 
  
         
-
 
 
 
@@ -157,6 +181,9 @@ movingsprites = pygame.sprite.Group()
 movingsprites.add(player)
 movesteps = 10 #how fast to move
 
+forwardX = 600 #when to scroll
+backwardX = 150 #when to scroll
+
 #enemy code
 enemy = Enemy(300,550, 'enemy.png') #spawn enemy
 enemy_list = pygame.sprite.Group() #create enemy group
@@ -178,24 +205,41 @@ while main == True:
                 sys.exit()
                 main = False
                 
-            if event.key == pygame.K_LEFT:
-                print('left stop')
+            if event.key == pygame.K_LEFT:                
                 player.control(movesteps, 0)
+                
             if event.key == pygame.K_RIGHT:
-                print('right stop')
                 player.control(-movesteps, 0)
-            if event.key == pygame.K_UP:
-                print('jump stop')
-
+                
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                print('left')
                 player.control(-movesteps, 0)
+                
             if event.key == pygame.K_RIGHT:
-                print('right')
                 player.control(movesteps, 0)
+                
             if event.key == pygame.K_UP:
-                print('jump')
+                player.jump(platform_list)
+
+    #scroll world forward
+    if player.rect.x >= forwardX:
+        scroll = player.rect.x - forwardX
+        player.rect.x = forwardX
+        for platform in platform_list:
+            platform.rect.x -= scroll
+
+        for enemy in enemy_list:
+            enemy.rect.x -= scroll
+
+    #scroll world backward
+    if player.rect.x <= backwardX:
+        scroll = min(1, (backwardX - player.rect.x))
+        player.rect.x = backwardX
+        for platform in platform_list:
+            platform.rect.x += scroll
+
+        for enemy in enemy_list:
+            enemy.rect.x += scroll
 
 
     screen.blit(backdrop, backdropRect) #if you have backdrop
