@@ -203,6 +203,7 @@ class Enemy (pygame.sprite.Sprite):
 
 '''SETUP'''
 #code runs once
+
 screenX = 1000 #width 1920
 screenY = 800 #height 1080
 
@@ -313,10 +314,10 @@ while main == True:
     player.update(enemy_list, platform_list, loot_list) #update player position
     movingsprites.draw(screen) #draw player
 
-    enemy_list.draw(screen) #refresh enemies
-    enemy.move() #move enemy sprite
-
+    for enemy in enemy_list:
+        enemy.move() #move enemy sprite
     loot_list.draw(screen) #refresh loot
+    enemy_list.draw(screen) #refresh enemies
 
     stats(player.score) #draw text
     
