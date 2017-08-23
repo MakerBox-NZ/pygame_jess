@@ -187,23 +187,22 @@ class Enemy (pygame.sprite.Sprite):
 
         self.counter += 1
 
+    def enemy1():
+        #enemy code
+        enemy_list = pygame.sprite.Group() #create enemy group
+
+        enemy = Enemy(300,520, 'enemy.png') #spawn enemy
+        enemy_list.add(enemy) #add enemy to group
+
+        enemy = Enemy(600,520, 'enemy.png') #spawn enemy
+        enemy_list.add(enemy) #add enemy to group
+
+        return enemy_list
+
  
 
 '''SETUP'''
 #code runs once
-def enemy1():
-    #enemy code
-    enemy_list = pygame.sprite.Group() #create enemy group
-
-    enemy = Enemy(300,520, 'enemy.png') #spawn enemy
-    enemy_list.add(enemy) #add enemy to group
-
-    enemy = Enemy(600,520, 'enemy.png') #spawn enemy
-    enemy_list.add(enemy) #add enemy to group
-
-    return enemy_list
-
-
 screenX = 1000 #width 1920
 screenY = 800 #height 1080
 
@@ -229,7 +228,7 @@ backdropRect = screen.get_rect()
 
 platform_list = Platform.level1() #set stage to Level 1
 loot_list = Platform.loot1() #set loot to Level 1
-enemy_list = enemy1() 
+enemy_list = Enemy.enemy1() 
 
 player = Player() #spawn player
 player.rect.x = 20
@@ -253,7 +252,7 @@ while main == True:
 
     if not platform_list:
         platform_list = Platform.level1()
-        enemy_list = enemy1()
+        enemy_list = Enemy.enemy1()
         loot_list = Platform.loot1()
     
     for event in pygame.event.get():
