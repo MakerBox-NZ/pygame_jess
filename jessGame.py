@@ -11,8 +11,8 @@ import pygame.freetype
 #put classes & functions here
 
 def stats(score):
-    #display text, 1, colour (rgb)
-    text_score = myfont.render("Score: "+str(score), 20,(250,147,248))
+    #display text, ?, colour (rgb)
+    text_score = myfont.render("Score: "+str(score), 1,(250,147,248))
     screen.blit(text_score, (4, 4))
     
 
@@ -48,6 +48,17 @@ class Platform(pygame.sprite.Sprite):
         return platform_list #at end of function level1
 
 
+    def loot1():
+        #loot level1
+        loot_list = pygame.sprite.Group()
+        loot = Platform(690, 570, 50, 48, os.path.join('images', 'loot.png'))
+        loot_list.add(loot)
+
+        return loot_list #at end of function loot1
+
+
+
+
 
 class Player(pygame.sprite.Sprite):
     #spawn a player
@@ -76,7 +87,7 @@ class Player(pygame.sprite.Sprite):
         self.momentumX += x
         self.momentumY += y
 
-    def update(self, enemy_list, platform_list):
+    def update(self, enemy_list, platform_list, loot_list):
         #update sprite position
         currentX = self.rect.x
         nextX = currentX+self.momentumX
@@ -111,6 +122,11 @@ class Player(pygame.sprite.Sprite):
             if idx == -1:
                 self.damage = 0 #set damage back to 0
                 self.score -= 1 #subtract 1 hp
+
+        loot_hit_list = pygame.sprite.spritecollide(self, loot_list, False)
+        for loot in loot_hit_list:
+            loot_list.remove(loot)
+            self.score += 1
 
         block_hit_list = pygame.sprite.spritecollide(self, platform_list, False)
         if self.momentumX > 0:
@@ -168,9 +184,6 @@ class Enemy (pygame.sprite.Sprite):
         self.counter += 1
 
  
-        
-
-
 
 '''SETUP'''
 #code runs once
@@ -199,10 +212,11 @@ backdrop = pygame.image.load(os.path.join('images','stage.png')).convert()
 backdropRect = screen.get_rect()
 
 platform_list = Platform.level1() #set stage to Level 1
+loot_list = Platform.loot1() #set loot to Level 1
 
 player = Player() #spawn player
 player.rect.x = 20
-player.rect.y = 565
+player.rect.y = 540
 movingsprites = pygame.sprite.Group()
 movingsprites.add(player)
 movesteps = 10 #how fast to move
@@ -211,12 +225,12 @@ forwardX = 600 #when to scroll
 backwardX = 150 #when to scroll
 
 #enemy code
-enemy = Enemy(300,550, 'enemy.png') #spawn enemy
 enemy_list = pygame.sprite.Group() #create enemy group
+
+enemy = Enemy(300,520, 'enemy.png') #spawn enemy
 enemy_list.add(enemy) #add enemy to group
  
         
-
 
 
 
@@ -257,6 +271,10 @@ while main == True:
         for enemy in enemy_list:
             enemy.rect.x -= scroll
 
+        for loot in loot_list:
+            loot.rect.x -= scroll
+            
+
     #scroll world backward
     if player.rect.x <= backwardX:
         scroll = min(1, (backwardX - player.rect.x))
@@ -267,17 +285,21 @@ while main == True:
         for enemy in enemy_list:
             enemy.rect.x += scroll
 
+        for loot in loot_list:
+            loot.rect.x += scroll
 
     screen.blit(backdrop, backdropRect) #if you have backdrop
     #screen.fill((0, 0, 255)) #if you don't have backdrop
 
     platform_list.draw(screen) #draw platforms on screen
     player.gravity() #check gravity
-    player.update(enemy_list, platform_list) #update player position
+    player.update(enemy_list, platform_list, loot_list) #update player position
     movingsprites.draw(screen) #draw player
 
     enemy_list.draw(screen) #refresh enemies
     enemy.move() #move enemy sprite
+
+    loot_list.draw(screen) #refresh loot
 
     stats(player.score) #draw text
     
