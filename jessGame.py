@@ -158,6 +158,7 @@ class Player(pygame.sprite.Sprite):
 
             #respawn
             platform_list.empty()
+            self.score = 0 #set score
 
             self.rect.x = 10
             self.rect.y = 20
@@ -178,9 +179,9 @@ class Enemy (pygame.sprite.Sprite):
     def move(self):
         #enemy movement
         if self.counter >= 0 and self.counter <= 30:
-            self.rect.x += 2
+            self.rect.y += 2
         elif self.counter >= 30 and self.counter <= 60:
-            self.rect.x -= 2
+            self.rect.y -= 2
         else:
             self.counter = 0
             print('reset')
@@ -191,10 +192,10 @@ class Enemy (pygame.sprite.Sprite):
         #enemy code
         enemy_list = pygame.sprite.Group() #create enemy group
 
-        enemy = Enemy(300,520, 'enemy.png') #spawn enemy
+        enemy = Enemy(400,520, 'enemy.png') #spawn enemy
         enemy_list.add(enemy) #add enemy to group
 
-        enemy = Enemy(600,520, 'enemy.png') #spawn enemy
+        enemy = Enemy(900,580, 'enemy.png') #spawn enemy
         enemy_list.add(enemy) #add enemy to group
 
         return enemy_list
